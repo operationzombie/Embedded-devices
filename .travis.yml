@@ -4,4 +4,10 @@ before_install:
   - sudo apt-get update -qq
 install:
   - sudo apt-get install -qq gcc-avr binutils-avr avr-libc
+
+notifications:
+  slack:
+    rooms:
+      - undeadbaby:$SLACK_KEY#random
+
 script: make
