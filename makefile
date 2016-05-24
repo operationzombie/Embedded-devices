@@ -6,7 +6,8 @@
 ##########    Check these every time you start a new project    ##########
 ##########------------------------------------------------------##########
 
-MCU   = atmega32
+MCU     = atmega32
+AVR_MCU = m32
 F_CPU = 8000000UL  
 BAUD  = 9600UL
 ## Also try BAUD = 19200 or 38400 if you're feeling lucky.
@@ -173,10 +174,10 @@ EFUSE = 0x00
 FUSE_STRING = -U lfuse:w:$(LFUSE):m -U hfuse:w:$(HFUSE):m -U efuse:w:$(EFUSE):m 
 
 fuses: 
-	$(AVRDUDE) -c $(PROGRAMMER_TYPE) -p $(MCU) \
+	$(AVRDUDE) -c $(PROGRAMMER_TYPE) -p $(AVR_MCU) \
 	           $(PROGRAMMER_ARGS) $(FUSE_STRING)
 show_fuses:
-	$(AVRDUDE) -c $(PROGRAMMER_TYPE) -p $(MCU) $(PROGRAMMER_ARGS) -nv	
+	$(AVRDUDE) -c $(PROGRAMMER_TYPE) -p $(AVR_MCU) $(PROGRAMMER_ARGS) -nv	
 
 ## Called with no extra definitions, sets to defaults
 set_default_fuses:  FUSE_STRING = -U lfuse:w:$(LFUSE):m -U hfuse:w:$(HFUSE):m -U efuse:w:$(EFUSE):m 
