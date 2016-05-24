@@ -13,8 +13,8 @@ If you're having trouble, let Layne know.
 
 http://oceanoptics.com/faq/windows-8-or-8-1-device-driver-issues/
 
-to disable digital signiture requirement, in order to load usbasp driver
-6) install the usbasp device driver (device manager > usb asp > update driver > select file)
+to disable digital signiture requirement, in order to load usbasp driver, 
+6) install the usbasp device driver, downloaded from DL from http://www.fischl.de/usbasp/, (device manager > usb asp > update driver > select file)
 7) copy makefile into your project directory
 8) run 'make' to build the project
 9) run 'make flash' to program your avr chip
