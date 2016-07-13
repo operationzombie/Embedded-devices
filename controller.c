@@ -9,6 +9,7 @@
 #define BAUD_PRESCALLER (((F_CPU / (BAUDRATE * 16UL))) - 1)
 
 #define INPUT_BUFFER_SIZE 20
+#define OUTPUT_BUFFER_SIZE 20
  
 void USART_init(void);
 unsigned char USART_receive(void);
@@ -17,6 +18,7 @@ void USART_putstring(char* StringPtr);
 
 char rx_buffer[INPUT_BUFFER_SIZE] = {'\n'}; //define recieve buffer
 char *current_rxb;
+char *current_txb;
 char update_rxb = 0;
 int i;
 
@@ -46,6 +48,20 @@ ISR(USART_TXC_vect)
 {
   //code
 }
+
+//transmit complete
+ISR(USART_UDRE_vect)
+{
+  //if we've got a valid character in the output buffer, send it
+  if (*current_txb){
+    UDR = *current_txb++;
+  }
+  else {
+    //data done transmitting, disable tx interrupt
+    UCSRB &= ~(1 << UDRE);
+
+  }
+}
 /* Initialize USART */
 void USART_init(void){
 
@@ -60,20 +76,17 @@ void USART_init(void){
 	UCSRC = (1<<UCSZ0)|(1<<UCSZ1)|(1<<URSEL); //set up UaRtControlandStatusRegisterC
 }
  
-/* Function to send byte/char */
-void USART_send( unsigned char data){
+/* /1* Function to send byte/char *1/ */
+/* void USART_send( unsigned char data){ */
 	
-	while(!(UCSRA & (1<<UDRE))); //wait for empty transmit buffer
-	UDR = data; //put data in udr
-}
+/* 	while(!(UCSRA & (1<<UDRE))); //wait for empty transmit buffer */
+/* 	UDR = data; //put data in udr */
+/* } */
  
 /* Send string */
-void USART_putstring(char* StringPtr){
-	
-	while(*StringPtr != 0x00){
-		USART_send(*StringPtr);
-	StringPtr++;}
-	
+void USART_putstring(char* S){
+  current_txb = S;
+  UCSRB |= (1<< UDRIE);
 }
 
 int  main()
