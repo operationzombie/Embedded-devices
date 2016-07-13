@@ -9,17 +9,18 @@
 #define BAUD_PRESCALLER (((F_CPU / (BAUDRATE * 16UL))) - 1)
 
 #define INPUT_BUFFER_SIZE 20
-#define OUTPUT_BUFFER_SIZE 20
  
 void USART_init(void);
 unsigned char USART_receive(void);
 void USART_send( unsigned char data);
 void USART_putstring(char* StringPtr);
 
-char rx_buffer[INPUT_BUFFER_SIZE] = {'\n'}; //define recieve buffer
+char rx_buffer[INPUT_BUFFER_SIZE] = {'\0'}; //define recieve buffer
+char complete_buffer[INPUT_BUFFER_SIZE] ; //define buffer for finished message
 char *current_rxb;
 char *current_txb;
 char update_rxb = 0;
+char currently_tx = 0;
 int i;
 
 //define interrupt routine
@@ -28,25 +29,13 @@ ISR(USART_RXC_vect)
 {
   //get the recieved character from the buffer
   char a = UDR;
-
+  *current_rxb++ = a;
   //if character is a newline or terminated
   //or if the buffer is full, trigger buffer handling
-  if (a == '\n' || a == '\r' || a == '\0' || *current_rxb){
-    *current_rxb = a;
-    current_rxb = rx_buffer;
+  if (a == '\r' || a == '\0' || *current_rxb){
     update_rxb = 1;
-
   }
-  else{
-    *current_rxb = a;
-    current_rxb++;
-  }
-}
 
-//transmit complete
-ISR(USART_TXC_vect)
-{
-  //code
 }
 
 //transmit complete
@@ -59,44 +48,37 @@ ISR(USART_UDRE_vect)
   else {
     //data done transmitting, disable tx interrupt
     UCSRB &= ~(1 << UDRE);
-
+    currently_tx = 0;
   }
 }
 /* Initialize USART */
 void USART_init(void){
-
   sei(); //enable global interrupts
 	
 	UBRRH = (uint8_t)(BAUD_PRESCALLER>>8); //set baud rate
 	UBRRL = (uint8_t)(BAUD_PRESCALLER);    
   UCSRA = (1<<UDRIE); //enable data registry empty
-	/* UCSRB = (1<<RXEN)|(1<<TXEN) | (1<<RXCIE) | (1<<TXCIE);           //enable tx/rx and complete interrupts */
 	UCSRB = (1<<RXEN)|(1<<TXEN) | (1<<RXCIE);           //enable tx/rx and complete interrupts TODO reenale txcie
   
 	UCSRC = (1<<UCSZ0)|(1<<UCSZ1)|(1<<URSEL); //set up UaRtControlandStatusRegisterC
 }
  
-/* /1* Function to send byte/char *1/ */
-/* void USART_send( unsigned char data){ */
-	
-/* 	while(!(UCSRA & (1<<UDRE))); //wait for empty transmit buffer */
-/* 	UDR = data; //put data in udr */
-/* } */
- 
 /* Send string */
+//WARNING: if this is called when currently transmitting,
+//the current message pointer will be replaced with this one
 void USART_putstring(char* S){
   current_txb = S;
   UCSRB |= (1<< UDRIE);
+  currently_tx = 1;
 }
 
 int  main()
 {
   current_rxb = rx_buffer; //set rx buffer pointer
   
-  //define LED outputs
+  //define LED outputs for blinking
   DDRA = 0x01;
   PORTA = 0x01;
-
 
 
   USART_init(); //init usart
@@ -104,15 +86,27 @@ int  main()
     if (update_rxb){ //a string has been recieved, update the things
       update_rxb = 0; //don't do this again
 
-      USART_putstring(rx_buffer);
+      //copy the rx buffer, then zero it for incoming transmission
+      for (i = 0; i < INPUT_BUFFER_SIZE; i++){
+        complete_buffer[i] = rx_buffer[i]; 
+        rx_buffer[i] = '\0'; 
+      }
+      current_rxb = rx_buffer; //reset the buffer pointer
+
+      //print the recieved message
+      USART_putstring(complete_buffer);
+
+      //delay while tx completes to print newline
+      //WARNING: this is blocking, for testing only
+      //must be removed when implementation of 
+      //timing sensitive content in main loop added
+      while (currently_tx){
+        _delay_ms(10);
+      }
+
       USART_putstring("\r\n");
 
-      for (i = 0; i < INPUT_BUFFER_SIZE; i++){ 
-        rx_buffer[i] = '\0';
-      } //zero the rx_buffer
     }
-
-
 
     _delay_ms(1000);
     //toggle LED 
