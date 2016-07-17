@@ -1,5 +1,6 @@
 #include "global.h"
 #include "uart.h"
+#include "timers.h"
  
 int i;
 
@@ -12,6 +13,8 @@ int  main()
   PORTA = 0x01;
 
   USART_init();                                 //init usart
+  TIMERS_init_async_timer();                    /* init timers */
+
   while(1){
     if (USART_need_rx_update()){                //a string has been recieved, update the things
       USART_unset_rxb_update();
