@@ -1,6 +1,7 @@
 #include "global.h"
 #include "uart.h"
 #include "timers.h"
+#include "pins.h"
  
 int i;
 
@@ -9,10 +10,12 @@ int  main()
   sei();                                        //enable global interrupts
   
   //define LED outputs for blinking
-  DDRA = 0x01;
-  PORTA = 0x01;
+  LED(1);
+  /* DDRA = 0x01; */
+  /* PORTA = 0x01; */
 
   USART_init();                                 //init usart
+  PINS_init();
   TIMERS_init_async_timer();                    /* init timers */
 
   while(1){
@@ -35,7 +38,11 @@ int  main()
     }
 
     _delay_ms(1000);
-    PORTA ^= 0xFF;                              /* toggle LED */
+    if (readBit(PORTB, 4)){
+      LED(0);
+    }
+    else{
+      LED(1);
+    }
   }
-
 }
