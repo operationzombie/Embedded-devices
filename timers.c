@@ -2,9 +2,11 @@
 #include "timers.h"
 #include "uart.h"
 
-#include <stdio.h>
+#include <stdlib.h>
 
 int tmr_count;
+char calibrating;
+char wait;
 
 /* 
  * ===  FUNCTION  ======================================================================
@@ -15,6 +17,11 @@ int tmr_count;
  */
 ISR(TIMER2_OVF_vect){
   //do async timeout things
+  if (calibrating){
+    TIMERS_stop_io_timer();
+    TIMERS_stop_async_timer();
+    wait = 0;
+  }
 }
 
 /* 
@@ -139,3 +146,88 @@ int TIMERS_get_io_count(void){
 /*
  * in the case of prescaler 1, 7.8125ms, main osc should count 7812.5 ticks if accurate
  */
+void TIMERS_calibrate_io_osc(int target_ticks, int threshold){
+
+  TIMERS_init_io_timer();
+  TIMERS_init_async_timer();
+
+  int prev_OSCALL = OSCCAL;
+  int wait = 1;
+  int latest_io_ticks = 1;
+  int prev_io_ticks = 0;
+  calibrating = 1;                         /* set calibrating mode */
+  int step = 255/4;
+  OSCCAL = 255/2;
+
+  while (1){
+    /*-----------------------------------------------------------------------------
+     *  main calibration loop.
+     *  run the timers, and find out how many ticks of the main io clock we 
+     *  have in the async period
+     *
+     *  using that number, perform a binary search on oscal to find the number that 
+     *  brings latest_io_ticks to within target_ticks +/- threshold
+     *-----------------------------------------------------------------------------*/
+
+    TIMERS_start_io_timer(1);
+    TIMERS_start_async_timer(1);
+
+    while (wait){_delay_ms(2);}                 /* wait till ticks gathered */
+
+    latest_io_ticks = TIMERS_get_io_count();
+
+    if (step > 2){
+      /*-----------------------------------------------------------------------------
+       *  step size is large enough that can safely binary search
+       *-----------------------------------------------------------------------------*/
+      if (latest_io_ticks > target_ticks){
+        //timer too fast, reduce oscal
+        OSCCAL = OSCCAL - step;
+        
+      }
+      else{
+        //timer too slow, increase oscal
+        OSCCAL = OSCCAL + step;
+      }
+       
+      step = step/2;
+    }
+    else{
+      /*-----------------------------------------------------------------------------
+       *  step size is too small for binary search, perform neighbour search
+       *-----------------------------------------------------------------------------*/
+      if (abs(target_ticks - latest_io_ticks) < abs(target_ticks - prev_io_ticks )){
+        /*-----------------------------------------------------------------------------
+         *  check that the difference is shrinking, if growing previous was better
+         *  return previous 
+         *-----------------------------------------------------------------------------*/
+        prev_OSCALL = OSCCAL;
+
+        if (latest_io_ticks > target_ticks){
+          //timer too fast, reduce oscal
+          OSCCAL = OSCCAL - 2;
+          
+        }
+        else{
+          //timer too slow, increase oscal
+          OSCCAL = OSCCAL + 2;
+        }
+      }
+      else{
+        OSCCAL = prev_OSCALL;
+        calibrating = 0;                         /* unset calibrating mode */
+        return;
+      }
+    }
+
+    _delay_ms(1);                               /* allow oscilator to settle at new freq */
+    prev_io_ticks = latest_io_ticks;
+
+  }
+
+}
+
+char TIMERS_calibrating(void){
+  return calibrating;
+}
+
