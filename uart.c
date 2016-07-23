@@ -53,8 +53,11 @@ ISR(USART_UDRE_vect)
  *  Description:  set all registers and initialize relevant variables to enable uart
  * =====================================================================================
  */
-void USART_init(void){
+void USART_init(unsigned long int baudrate, unsigned long int cpu_freq){
+  /* #define BAUD_PRESCALLER  */
   current_rxb = rx_buffer; //set rx buffer pointer
+
+  int BAUD_PRESCALLER = (((cpu_freq / (baudrate * 16UL))) - 1);
 	
 	UBRRH = (uint8_t)(BAUD_PRESCALLER>>8); //set baud rate
 	UBRRL = (uint8_t)(BAUD_PRESCALLER);    

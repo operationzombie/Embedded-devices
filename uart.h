@@ -1,7 +1,7 @@
 #ifndef UART_H
 #define UART_H
 
-void USART_init(void);
+void USART_init(unsigned long int baudrate, unsigned long int cpu_freq);
 unsigned char USART_receive(void);
 void USART_send( unsigned char data);
 void USART_putstring(char* StringPtr);

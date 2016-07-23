@@ -2,20 +2,22 @@
 #include "uart.h"
 #include "timers.h"
 #include "pins.h"
+#include <stdio.h>
  
 int i;
+unsigned long int cpu_freq = 1000000;
+unsigned long int BAUDRATE = 19200;
 
 int  main()
 {
   sei();                                        //enable global interrupts
   
-  //define LED outputs for blinking
-  LED(1);
-  /* DDRA = 0x01; */
-  /* PORTA = 0x01; */
+  LED(1);                                       /* turn led on */
+  cpu_freq = TIMERS_get_current_freq();            /* get the cpu frequency, found from xtal/timers */
 
-  USART_init();                                 //init usart
+  USART_init(BAUDRATE, F_CPU);                  //init usart
   PINS_init();
+
   TIMERS_init_async_timer();                    /* init timers */
 
   while(1){
@@ -38,7 +40,8 @@ int  main()
     }
 
     _delay_ms(1000);
-    if (readBit(PORTB, 4)){
+
+    if (readLED){
       LED(0);
     }
     else{
@@ -46,3 +49,4 @@ int  main()
     }
   }
 }
+

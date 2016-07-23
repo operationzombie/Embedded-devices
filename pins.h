@@ -20,6 +20,7 @@
 
 //general macros
 #define LED(x) setPin(PORTB, 4, x);
+#define readLED readBit(PORTB, 4)
 
 //define xbee pin macros
 #define RTS(x) setPin(PORTD, 2, x);

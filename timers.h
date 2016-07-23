@@ -12,4 +12,5 @@ int  TIMERS_get_io_count(void);
 
 void TIMERS_calibrate_io_osc(int target_ticks, int threshold);
 char TIMERS_calibrating(void);
+unsigned long int TIMERS_get_current_freq(void);
 #endif

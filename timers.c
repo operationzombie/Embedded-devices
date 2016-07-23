@@ -42,7 +42,6 @@ ISR(TIMER2_COMP_vect){
  * =====================================================================================
  */
 void TIMERS_init_async_timer(void){
-  USART_putstring("Initiating timers\n");
   ASSR |= (1 << AS2);                           /* set timer 2 input from tosc */
   TIMSK |= (1 << TOIE2);                        /* enable overflow interrupt */
 /*TIMSK |= (1 << OCIE2);                        /1* enable output compare interrupt *1/ */
@@ -231,3 +230,42 @@ char TIMERS_calibrating(void){
   return calibrating;
 }
 
+unsigned long int TIMERS_get_current_freq(void){
+  TIMERS_init_io_timer();
+  TIMERS_init_async_timer();
+
+  unsigned long int ticks_total = 0;
+  unsigned long int ave_ticks;
+
+  short int t = 0;
+
+  /*-----------------------------------------------------------------------------
+   *  take the average of 10 tick counts, calculate the frequncy from that
+   *-----------------------------------------------------------------------------*/
+  for (t = 0; t < 10; t++){
+    calibrating = 1;
+
+    TIMERS_start_io_timer(1);
+    TIMERS_start_async_timer(1);
+
+    _delay_ms(10);
+
+    ticks_total += TIMERS_get_io_count();
+
+    _delay_ms(30);
+  }
+
+  ave_ticks = ticks_total / 10;
+
+
+  /*-----------------------------------------------------------------------------
+   *  magic number 128 comes from 1/7.8125*10^93.
+   *  to calculate the frequency we do ticks/period.
+   *  to simplify things, change to ticks * 1/period
+   *  1/period = 1 / (7.8125*10^-3) = 128
+   *
+   *  7.8125 is the number of ms in the total async timeout
+   *-----------------------------------------------------------------------------*/
+  return (ave_ticks * 128);
+
+}
