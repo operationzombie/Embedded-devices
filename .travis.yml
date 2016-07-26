@@ -6,6 +6,9 @@ install:
   - sudo apt-get install -qq gcc-avr binutils-avr avr-libc
 
 notifications:
+  email:
+    paddygarmin@gmail.com
+    on_sucess: always
   slack: 
     rooms:
       - patrick_sav:WDGNd6FP2Uu61jNcbMaHLSIv#random
