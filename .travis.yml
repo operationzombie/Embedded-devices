@@ -6,8 +6,8 @@ install:
   - sudo apt-get install -qq gcc-avr binutils-avr avr-libc
 
 notifications:
-  slack:
-    rooms:
-      - undeadbaby:$SLACK_KEY#random
+  email:
+  - paddygarmin@gmail.com
+  on_success: always
 
 script: make
