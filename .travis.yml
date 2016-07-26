@@ -10,9 +10,9 @@ notifications:
   - paddygarmin@gmail.com
   slack:
     rooms:
-      - undeadbaby:WDGNd6FP2Uu61jNcbMaHLSIv#random
-      on_success: change
-      on_failure: always
-travis encrypt "undeadbaby:WDGNd6FP2Uu61jNcbMaHLSIv" --add notifications.slack
+    - undeadbaby:WDGNd6FP2Uu61jNcbMaHLSIv#random
+    on_success: change
+    on_failure: always
+
 
 script: make
