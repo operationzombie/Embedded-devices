@@ -8,7 +8,7 @@ install:
 notifications:
   email:
   - paddygarmin@gmail.com
-  slack: '<account>:<token>#development'
+  slack: '<account>:<token>#random'
   on_success: always
 
 script: make
