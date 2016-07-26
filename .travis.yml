@@ -8,7 +8,11 @@ install:
 notifications:
   email:
   - paddygarmin@gmail.com
-  slack: '<account>:<token>#random'
-  on_success: always
+  slack:
+    rooms:
+      - undeadbaby:WDGNd6FP2Uu61jNcbMaHLSIv#random
+      on_success: change
+      on_failure: always
+travis encrypt "undeadbaby:WDGNd6FP2Uu61jNcbMaHLSIv" --add notifications.slack
 
 script: make
