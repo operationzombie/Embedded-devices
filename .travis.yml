@@ -8,11 +8,11 @@ install:
 notifications:
   email:
     paddygarmin@gmail.com
-    on_sucess: always
+  on_sucess: always
   slack: 
     rooms:
       - patrick_sav:WDGNd6FP2Uu61jNcbMaHLSIv#random
-      on_success: always
-      on_failue: always
+    on_success: always
+    on_failue: always
       
 script: make
