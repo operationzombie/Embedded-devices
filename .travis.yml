@@ -6,13 +6,12 @@ install:
   - sudo apt-get install -qq gcc-avr binutils-avr avr-libc
 
 notifications:
-   email:
-   - paddygarmin@gmail.com
-   on_success: always
+  email:
+  -  paddygarmin@gmail.com
   slack: 
     rooms:
       - patrick_sav:WDGNd6FP2Uu61jNcbMaHLSIv#random
-      on_success: always
-      on_failue: always
+    on_success: always
+    on_failure: always
       
 script: make
