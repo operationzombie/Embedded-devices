@@ -8,6 +8,9 @@ install:
 notifications:
   slack:
     rooms:
-      - undeadbaby:$SLACK_KEY#random
+    - undeadbaby:sOVrai0yjsQvDj9KBMXso9Pz#random
+    on_success: change
+    on_failure: always
+
 
 script: make
