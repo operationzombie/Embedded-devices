@@ -8,9 +8,8 @@ install:
 notifications:
   slack:
     rooms:
-    - undeadbaby:$SLACK_KEY
-    - undeadbaby:$Slack_key_temp
-    on_success: always
+    - undeadbaby:sOVrai0yjsQvDj9KBMXso9Pz#random
+    on_success: change
     on_failure: always
 
 
