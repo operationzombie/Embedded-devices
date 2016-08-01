@@ -1,7 +1,7 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#define F_CPU 1000000UL
+#define F_CPU 16000000UL
  
 #include <avr/io.h>
 #include <avr/interrupt.h>

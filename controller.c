@@ -8,8 +8,8 @@ int  main()
   sei();                                        //enable global interrupts
   
   //define LED outputs for blinking
-  DDRA = 0x01;
-  PORTA = 0x01;
+  DDRB = 0x01;
+  PORTB = 0x01;
 
   USART_init();                                 //init usart
   while(1){
@@ -32,7 +32,7 @@ int  main()
     }
 
     _delay_ms(1000);
-    PORTA ^= 0xFF;                              /* toggle LED */
+    PORTB ^= 0xFF;                              /* toggle LED */
   }
 
 }

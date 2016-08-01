@@ -6,9 +6,9 @@
 ##########    Check these every time you start a new project    ##########
 ##########------------------------------------------------------##########
 
-MCU     = atmega32
-AVR_MCU = m32
-F_CPU = 1000000UL  
+MCU     = atmega328p
+AVR_MCU = m328p
+F_CPU = 16000000UL  
 BAUD  = 9600UL
 ## Also try BAUD = 19200 or 38400 if you're feeling lucky.
 
@@ -23,9 +23,9 @@ LIBDIR = ../../AVR-Programming-Library
 ##########        (Can override.  See bottom of file.)          ##########
 ##########------------------------------------------------------##########
 
-PROGRAMMER_TYPE = usbasp
+PROGRAMMER_TYPE = arduino
 # extra arguments to avrdude: baud rate, chip type, -F flag, etc.
-PROGRAMMER_ARGS = 	
+PROGRAMMER_ARGS = -P COM7	
 
 ##########------------------------------------------------------##########
 ##########                  Program Locations                   ##########
