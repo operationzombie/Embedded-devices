@@ -8,7 +8,7 @@ install:
 notifications:
   slack:
     rooms:
-    - undeadbaby:sOVrai0yjsQvDj9KBMXso9Pz#random
+    - undeadbaby:o1qjQIY53FyeTPFy5bCfan9n#random
     on_success: change
     on_failure: always
 
