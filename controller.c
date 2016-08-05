@@ -10,7 +10,7 @@ short int mode = 0;
 unsigned long int cpu_freq = 1000000;
 unsigned long int BAUDRATE = 19200;
 
-int pwm_a = 64; 
+int pwm_a = 128; 
 int pwm_b = 128;
 int pwm_c = 128 + 64;
 int pwm_d = 255; 
@@ -32,7 +32,7 @@ int  main()
   TIMERS_set_io_compare(PWM_calculate_timer1_ovf(cpu_freq, 50, 255));
   TIMERS_start_io_timer(1,1);
 
-  mode = 0;
+  mode = 2;
 
   while(1){
   /*-----------------------------------------------------------------------------
@@ -67,11 +67,12 @@ int  main()
         _delay_ms(1000);
         if (readLED){
           LED(0);
-          PWM_set_pin_status(curr_count, pwm_a, PORTC, 0); /* ALI1 */
+          /* PWM_set_half_pwm(20, 10, 0); /1* ALI1 *1/ */
         }
         else{
           LED(1);
-          PWM_set_pin_status(curr_count, pwm_a, PORTC, 1); /* ALI1 */
+          /* setPin(PORTB, 4, 1); */
+          /* PWM_set_half_pwm(10, 20, 0); /1* ALI1 *1/ */
         }
         break;
 
@@ -85,10 +86,10 @@ int  main()
        *  half swing PWM mode
        *-----------------------------------------------------------------------------*/
       case 2:
-        PWM_set_pin_status(curr_count, pwm_a, PORTC, 1); /* ALI1 */
-        PWM_set_pin_status(curr_count, pwm_b, PORTC, 3); /* BLI1 */
-        PWM_set_pin_status(curr_count, pwm_c, PORTC, 5); /* ALI2 */
-        PWM_set_pin_status(curr_count, pwm_d, PORTD, 7); /* BLI2 */
+        PWM_set_half_pwm(curr_count, pwm_a, 0); /* ALI1 */
+        PWM_set_half_pwm(curr_count, pwm_b, 1); /* BLI1 */
+        /* PWM_set_half_pwm(curr_count, pwm_c, 2); /1* ALI2 *1/ */
+        /* PWM_set_half_pwm(curr_count, pwm_d, 3); /1* BLI2 *1/ */
 
         break;
     }

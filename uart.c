@@ -25,7 +25,6 @@ ISR(USART_RXC_vect)
   if (a == '\r' || a == '\0' || *current_rxb){
     update_rxb = 1;
   }
-
 }
 
 /* 
