@@ -4,9 +4,21 @@
 
 #include <stdlib.h>
 
-int tmr_count;
-char calibrating;
-char wait;
+int tmr_count = 0;
+int tmr_max = 0;
+short int wait;
+
+/*-----------------------------------------------------------------------------
+ *  Modes:
+ *
+ * Value      Mode
+ * 0          None
+ * 1          Calibrating
+ * 2          PWM (half swing)
+ * 3          PWM (full swing)
+ * 4          Servo
+ * 5          Stepper
+ *-----------------------------------------------------------------------------*/
 
 /* 
  * ===  FUNCTION  ======================================================================
@@ -17,8 +29,7 @@ char wait;
  */
 ISR(TIMER2_OVF_vect){
   //do async timeout things
-  if (calibrating){
-    TIMERS_stop_io_timer();
+  if (mode == 1){
     TIMERS_stop_async_timer();
     wait = 0;
   }
@@ -37,6 +48,33 @@ ISR(TIMER2_COMP_vect){
 
 /* 
  * ===  FUNCTION  ======================================================================
+ *         Name:  TIMER1_OVF_vect
+ *  Description:  16b timer has overflowed
+ *                32khz xtal, meaning one second has passed
+ * =====================================================================================
+ */
+ISR(TIMER1_OVF_vect){
+  //io timer overflow
+}
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  TIMER1_COMP_vect
+ *  Description:  the timer 1 count regester TCNT1 matched the value in the 
+ *                output compare register OCR1
+ * =====================================================================================
+ */
+ISR(TIMER1_COMPA_vect){
+  if ((mode == 2) || (mode == 3)){
+    tmr_count++;
+    if (tmr_count == tmr_max){
+      tmr_count = 0;
+    }
+    //pwm mode
+  }
+}
+/* 
+ * ===  FUNCTION  ======================================================================
  *         Name:  TIMERS_init_async_timer
  *  Description:  Initializes the async timer
  * =====================================================================================
@@ -48,7 +86,7 @@ void TIMERS_init_async_timer(void){
 
   tmr_count = 0;
   TIMERS_start_async_timer(5);                  /* set the overflow time at 1s */
-  /* TIMERS_start_io_timer(1); */
+  /* TIMERS_start_io_timer(1,0); */
 }
 
 /* 
@@ -63,6 +101,17 @@ void TIMERS_set_async_compare_value(char comp){
   OCR2 = comp;
 }
 
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  TIMERS_set_io_compare_value
+ *  Description:  Set the io counter compare value
+ *                when the timer count is equal to this value, fire the compare 
+ *                interrupt 
+ * =====================================================================================
+ */
+void TIMERS_set_io_compare(short int  comp){
+  OCR1A = comp;
+}
 
 /* 
  * ===  FUNCTION  ======================================================================
@@ -93,6 +142,8 @@ void TIMERS_stop_async_timer(void){
 
 
 void TIMERS_init_io_timer(void){
+  TIMSK |= (1 << TOIE1);                        /* timer/counter 1 overflow interrupt enable */
+  TIMSK |= (1 << OCIE1A);                       /* output compare match A interrupt enable */
 
 }
 
@@ -102,6 +153,9 @@ void TIMERS_init_io_timer(void){
  *  Description:  Like start_async_timer this starts the timer with the timer control
  *                reg set to the given paramater. the prescaler is set by the lower 
  *                three bits
+ *
+ *                ctc is the 'clear timer on compare' bit. If set to 1, then the 
+ *                io timer will be reset when TCNT1 matches OC1A values
  *
  *                number  prescale
  *                0       off
@@ -115,9 +169,10 @@ void TIMERS_init_io_timer(void){
  *
  * =====================================================================================
  */
-void TIMERS_start_io_timer(char timer){
+void TIMERS_start_io_timer(char timer, char ctc){
   TCNT1 = 0;
   TCCR1B = timer;
+  TCCR1B |= (ctc << WGM12);
 }
 
 /* 
@@ -154,7 +209,7 @@ void TIMERS_calibrate_io_osc(int target_ticks, int threshold){
   int wait = 1;
   int latest_io_ticks = 1;
   int prev_io_ticks = 0;
-  calibrating = 1;                         /* set calibrating mode */
+  mode = 1;                         /* set calibrating mode */
   int step = 255/4;
   OSCCAL = 255/2;
 
@@ -168,7 +223,7 @@ void TIMERS_calibrate_io_osc(int target_ticks, int threshold){
      *  brings latest_io_ticks to within target_ticks +/- threshold
      *-----------------------------------------------------------------------------*/
 
-    TIMERS_start_io_timer(1);
+    TIMERS_start_io_timer(1,0);
     TIMERS_start_async_timer(1);
 
     while (wait){_delay_ms(2);}                 /* wait till ticks gathered */
@@ -214,7 +269,7 @@ void TIMERS_calibrate_io_osc(int target_ticks, int threshold){
       }
       else{
         OSCCAL = prev_OSCALL;
-        calibrating = 0;                         /* unset calibrating mode */
+        mode = 0;                         /* unset calibrating mode */
         return;
       }
     }
@@ -226,10 +281,17 @@ void TIMERS_calibrate_io_osc(int target_ticks, int threshold){
 
 }
 
-char TIMERS_calibrating(void){
-  return calibrating;
+char TIMERS_get_mode(void){
+  return mode;
 }
 
+int TIMERS_get_tmr_count(void){
+  return tmr_count;
+}
+
+void TIMERS_set_tmr_max(int max){
+  tmr_max = max;
+}
 unsigned long int TIMERS_get_current_freq(void){
   TIMERS_init_io_timer();
   TIMERS_init_async_timer();
@@ -243,9 +305,8 @@ unsigned long int TIMERS_get_current_freq(void){
    *  take the average of 10 tick counts, calculate the frequncy from that
    *-----------------------------------------------------------------------------*/
   for (t = 0; t < 10; t++){
-    calibrating = 1;
 
-    TIMERS_start_io_timer(1);
+    TIMERS_start_io_timer(1,0);
     TIMERS_start_async_timer(1);
 
     _delay_ms(10);

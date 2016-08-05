@@ -9,4 +9,6 @@
 #define INPUT_BUFFER_SIZE 20
 #define F_CPU 1000000UL
 
+extern short int mode;
+
 #endif
