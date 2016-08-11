@@ -1,6 +1,7 @@
 #include "global.h"
 #include "timers.h"
 #include "uart.h"
+#include "pins.h"
 
 #include <stdlib.h>
 
@@ -55,6 +56,28 @@ ISR(TIMER2_COMP_vect){
  */
 ISR(TIMER1_OVF_vect){
   //io timer overflow
+  switch (mode){
+    case 2:
+      //set half pwm a high
+      AHI1(1);
+      ALI1(0);
+      AHI2(1);
+      ALI2(0);
+      break;
+    case 3:
+      //set full pwm a high
+        AHI1(1);
+        ALI1(0);
+        BHI1(0);
+        BLI1(1);
+
+        AHI2(1);
+        ALI2(0);
+        BHI2(0);
+        BLI2(1);
+      break;
+
+  }
 }
 
 /* 
@@ -65,12 +88,36 @@ ISR(TIMER1_OVF_vect){
  * =====================================================================================
  */
 ISR(TIMER1_COMPA_vect){
-  if ((mode == 2) || (mode == 3)){
-    tmr_count++;
-    if (tmr_count == tmr_max){
-      tmr_count = 0;
-    }
-    //pwm mode
+  switch (mode){
+    case 2:
+      //set half pwm a high
+      AHI1(0);
+      ALI1(1);
+      break;
+    case 3:
+      //set full pwm a high
+        AHI1(0);
+        ALI1(1);
+        BHI1(1);
+        BLI1(0);
+      break;
+  }
+}
+
+ISR(TIMER1_COMPB_vect){
+  switch (mode){
+    case 2:
+      //set half pwm a high
+      AHI2(0);
+      ALI2(1);
+      break;
+    case 3:
+      //set full pwm a high
+        AHI2(0);
+        ALI2(1);
+        BHI2(1);
+        BLI2(0);
+      break;
   }
 }
 /* 
@@ -109,8 +156,9 @@ void TIMERS_set_async_compare_value(char comp){
  *                interrupt 
  * =====================================================================================
  */
-void TIMERS_set_io_compare(short int  comp){
-  OCR1A = comp;
+void TIMERS_set_io_compare(long int  compa, long int compb){
+  OCR1A = compa;
+  OCR1B = compb;
 }
 
 /* 

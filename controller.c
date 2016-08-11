@@ -6,14 +6,10 @@
 #include <stdio.h>
  
 int i;
-short int mode = 0;
+short int mode = 2;
 unsigned long int cpu_freq = 1000000;
 unsigned long int BAUDRATE = 19200;
 
-int pwm_a = 128; 
-int pwm_b = 128;
-int pwm_c = 128 + 64;
-int pwm_d = 255; 
 
 int  main()
 {
@@ -28,9 +24,8 @@ int  main()
   TIMERS_init_async_timer();                    /* init timers */
 
   TIMERS_init_io_timer();
-  TIMERS_set_tmr_max(255);
-  TIMERS_set_io_compare(PWM_calculate_timer1_ovf(cpu_freq, 50, 255));
-  TIMERS_start_io_timer(1,1);
+  /* TIMERS_set_tmr_max(255); */
+  TIMERS_start_io_timer(1,0);
 
   mode = 2;
 
@@ -55,9 +50,6 @@ int  main()
 
       USART_putstring("\r\n");
     }
-
-    int curr_count = TIMERS_get_tmr_count();
-
 
     switch(mode){
       /*-----------------------------------------------------------------------------
@@ -86,10 +78,7 @@ int  main()
        *  half swing PWM mode
        *-----------------------------------------------------------------------------*/
       case 2:
-        PWM_set_half_pwm(curr_count, pwm_a, 0); /* ALI1 */
-        PWM_set_half_pwm(curr_count, pwm_b, 1); /* BLI1 */
-        /* PWM_set_half_pwm(curr_count, pwm_c, 2); /1* ALI2 *1/ */
-        /* PWM_set_half_pwm(curr_count, pwm_d, 3); /1* BLI2 *1/ */
+        TIMERS_set_io_compare(16383,0);
 
         break;
     }
