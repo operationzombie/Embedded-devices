@@ -31,7 +31,7 @@ int  main()
       USART_putstring("\r\n");
     }
 
-    _delay_ms(1000);
+    _delay_ms(100);
     PORTB ^= 0xFF;                              /* toggle LED */
   }
 
