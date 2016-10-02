@@ -37,8 +37,8 @@ int  main()
     //values are 0-25 for dutycycle at 600Hz
     //first argument is pin 9
     //second argument is pin 10
-    PWM_set(25,0);
-    MOTOR_set_CW();
+    PWM_set(10,0);
+    MOTOR_set_CCW();
   }
 
 }
