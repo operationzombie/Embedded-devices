@@ -25,18 +25,21 @@ LIBDIR = ../../AVR-Programming-Library
 
 PROGRAMMER_TYPE = arduino
 # extra arguments to avrdude: baud rate, chip type, -F flag, etc.
-PROGRAMMER_ARGS = -P /dev/ttyACM0 -C/usr/local/lib/arduino-1.6.4/hardware/tools/avr/etc/avrdude.conf
+#PROGRAMMER_ARGS = -P /dev/ttyACM0 -C/usr/local/lib/arduino-1.6.4/hardware/tools/avr/etc/avrdude.conf
+PROGRAMMER_ARGS = -P COM5
 
 ##########------------------------------------------------------##########
 ##########                  Program Locations                   ##########
 ##########     Won't need to change if they're in your PATH     ##########
 ##########------------------------------------------------------##########
 
-CC = /usr/local/lib/arduino-1.6.4/hardware/tools/avr/bin/avr-gcc
+#CC = /usr/local/lib/arduino-1.6.4/hardware/tools/avr/bin/avr-gcc
+CC = avr-gcc
 OBJCOPY = avr-objcopy
 OBJDUMP = avr-objdump
 AVRSIZE = avr-size
-AVRDUDE = /usr/local/lib/arduino-1.6.4/hardware/tools/avr/bin/avrdude
+#AVRDUDE = /usr/local/lib/arduino-1.6.4/hardware/tools/avr/bin/avrdude
+AVRDUDE = avrdude
 
 ##########------------------------------------------------------##########
 ##########                   Makefile Magic!                    ##########

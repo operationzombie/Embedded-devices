@@ -1,5 +1,8 @@
 #include "global.h"
 #include "uart.h"
+#include "pwm.h"
+#include "pins.h"
+#include "motor.h"
  
 int i;
 
@@ -7,11 +10,10 @@ int  main()
 {
   sei();                                        //enable global interrupts
   
-  //define LED outputs for blinking
-  DDRB = 0x01;
-  PORTB = 0x01;
-
+  PINS_init();
+  MOTOR_init();
   USART_init();                                 //init usart
+
   while(1){
     if (USART_need_rx_update()){                //a string has been recieved, update the things
       USART_unset_rxb_update();
@@ -31,8 +33,12 @@ int  main()
       USART_putstring("\r\n");
     }
 
-    _delay_ms(100);
-    PORTB ^= 0xFF;                              /* toggle LED */
+    _delay_ms(1000);
+    //values are 0-25 for dutycycle at 600Hz
+    //first argument is pin 9
+    //second argument is pin 10
+    PWM_set(25,0);
+    MOTOR_set_CW();
   }
 
 }
