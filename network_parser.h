@@ -1,8 +1,6 @@
 #include "global.h"
 #include "uart.h"
-#include <string.h>
 
-char* name = "ARIEL";
 
 int parse_message(char* message);
 int parse_motor(char* message, int i);

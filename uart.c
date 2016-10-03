@@ -9,6 +9,9 @@ char update_rxb = 0;
 char currently_tx = 0;
 int u;                                          //uart for loop counter
 
+/*Prototypes */
+void send_update();
+
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  USART_RXC_vect
@@ -153,4 +156,5 @@ void USART_send( unsigned char data)
   //when the buffer is empty write data to the transmitted  
   UDR0 = data;
 }
+
 
