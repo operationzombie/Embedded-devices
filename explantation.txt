@@ -1,0 +1,10 @@
+// Hello 2017 ENGR301/302 Project group
+// As should have been made clear by the handover documentation
+// we had to implement a quick workaround at the end of the project
+// to reach our MVP.
+// Consequently this is an archive of the old code before we 
+// implemented the workaround and is purely for usbasp coding
+// and the discrete, non arduino, ATMEL ATMega32a-pu controller
+
+// Best wishes
+// Operation Zombie 2016
