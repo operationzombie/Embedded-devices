@@ -1,6 +1,9 @@
 #ifndef UART_H
 #define UART_H
 
+#include <string.h>
+#include <stdlib.h>
+
 void USART_init(void);
 unsigned char USART_receive(void);
 void USART_send( unsigned char data);
