@@ -9,6 +9,9 @@ char update_rxb = 0;
 char currently_tx = 0;
 int u;                                          //uart for loop counter
 
+/*Prototypes */
+void send_update();
+
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  USART_RXC_vect
@@ -55,13 +58,15 @@ ISR(USART_UDRE_vect)
  */
 void USART_init(void){
   current_rxb = rx_buffer; //set rx buffer pointer
-	
-	UBRR0H = (uint8_t)(BAUD_PRESCALLER>>8); //set baud rate
-	UBRR0L = (uint8_t)(BAUD_PRESCALLER);    
-  UCSR0A = (1<<UDRIE0); //enable data registry empty
-	UCSR0B = (1<<RXEN0)|(1<<TXEN0) | (1<<RXCIE0);           //enable tx/rx and complete interrupts TODO reenale txcie
   
-	UCSR0C = (1<<UCSZ00)|(1<<UCSZ01); //set up UaRtControlandStatusRegisterC
+  UBRR0H = (uint8_t)(BAUD_PRESCALLER>>8); //set baud rate
+  UBRR0L = (uint8_t)(BAUD_PRESCALLER);    
+  UCSR0A = (1<<UDRIE0); //enable data registry empty
+  UCSR0B = (1<<RXEN0)|(1<<TXEN0) | (1<<RXCIE0);           //enable tx/rx and complete interrupts TODO reenale txcie
+  
+  //UCSR0C = (1<<UCSZ00)|(1<<UCSZ01); //set up UaRtControlandStatusRegisterC
+    UCSR0C = ((0<<USBS0)|(1 << UCSZ01)|(1<<UCSZ00));  //ADDED UCSZ00
+    sei();//ADDED
 }
  
 /* 
@@ -139,3 +144,17 @@ void USART_copy_rxb(void){
 char* USART_get_last_message(void){
   return complete_buffer;
 }
+
+
+/*STUFF THAT IS PROBABLY GOING TO BREAK EVERYTHING*/
+
+void USART_send( unsigned char data)
+{
+  //while the transmit buffer is not empty loop
+  while(!(UCSR0A & (1<<UDRE0)));
+  
+  //when the buffer is empty write data to the transmitted  
+  UDR0 = data;
+}
+
+
