@@ -26,6 +26,7 @@ LIBDIR = ../../AVR-Programming-Library
 PROGRAMMER_TYPE = arduino
 # extra arguments to avrdude: baud rate, chip type, -F flag, etc.
 PROGRAMMER_ARGS = -P /dev/ttyACM0 -C/usr/local/lib/arduino-1.6.4/hardware/tools/avr/etc/avrdude.conf
+PROGRAMMER_ARGS = -P COM5
 
 ##########------------------------------------------------------##########
 ##########                  Program Locations                   ##########

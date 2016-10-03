@@ -25,7 +25,7 @@ ISR(USART_RX_vect)
   *current_rxb++ = a;
   //if character is a newline or terminated
   //or if the buffer is full, trigger buffer handling
-  if (a == '\r' || a == '\0' || a == '\n' ||  !(*current_rxb)){
+  if (a == '\r' || a == '\0' || a == '\n' ||  (*current_rxb)){
     update_rxb = 1;
   }
 
