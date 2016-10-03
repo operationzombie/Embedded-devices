@@ -4,6 +4,8 @@
 #include "pins.h"
 #include "motor.h"
 #include "stdio.h"
+#include "network_parser.h"
+
  
 int i, count;
 int speed;
@@ -46,9 +48,6 @@ int  main()
   //INTS_init_0(2);                               //enable interrupt 0, on change
   //INTS_init_1(2);                               //enable interrupt 1, on change
 
-  USART_putstring("Initializing\r\n");
-  _delay_ms(20);
-
   while(1){
     count++;
     if (USART_need_rx_update()){                //a string has been recieved, update the things
@@ -73,7 +72,6 @@ int  main()
     //sprintf(buf,"pin11: %d\r\n",readBit(PIND,2)); //read the value from pin 11, write to serial
     //USART_putstring(buf);
     //_delay_ms(1000);
-  }
 }
 
 
