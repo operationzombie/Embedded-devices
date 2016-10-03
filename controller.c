@@ -26,6 +26,7 @@ int  main()
                            /* toggle LED */
   }
 
+    _delay_ms(1000);
 }
 
 

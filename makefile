@@ -7,8 +7,8 @@
 ##########------------------------------------------------------##########
 
 MCU     = atmega328p
-AVR_MCU = m328p
-F_CPU = 16000000UL  
+AVR_MCU = atmega328p
+F_CPU = 1000000UL  
 BAUD  = 9600UL
 ## Also try BAUD = 19200 or 38400 if you're feeling lucky.
 
@@ -25,18 +25,18 @@ LIBDIR = ../../AVR-Programming-Library
 
 PROGRAMMER_TYPE = arduino
 # extra arguments to avrdude: baud rate, chip type, -F flag, etc.
-PROGRAMMER_ARGS = -P COM7	
+PROGRAMMER_ARGS = -P /dev/ttyACM0 -C/usr/local/lib/arduino-1.6.4/hardware/tools/avr/etc/avrdude.conf
 
 ##########------------------------------------------------------##########
 ##########                  Program Locations                   ##########
 ##########     Won't need to change if they're in your PATH     ##########
 ##########------------------------------------------------------##########
 
-CC = avr-gcc
+CC = /usr/local/lib/arduino-1.6.4/hardware/tools/avr/bin/avr-gcc
 OBJCOPY = avr-objcopy
 OBJDUMP = avr-objdump
 AVRSIZE = avr-size
-AVRDUDE = avrdude
+AVRDUDE = /usr/local/lib/arduino-1.6.4/hardware/tools/avr/bin/avrdude
 
 ##########------------------------------------------------------##########
 ##########                   Makefile Magic!                    ##########
