@@ -6,6 +6,7 @@
 
 
 int parse_message(char* message);
+int parse_name(char* message, int i);
 int parse_motor(char* message, int i);
 int parse_pwm(char* message, int i);
 int parse_dir(char* message, int i);
