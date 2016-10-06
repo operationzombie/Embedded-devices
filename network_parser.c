@@ -6,6 +6,7 @@
 char* name = "BELLE";
 
 int parse_message(char* message);
+int parse_name(char* message, int i);
 int parse_motor(char* message, int i);
 int parse_pwm(char* message, int i);
 int parse_dir(char* message, int i);
@@ -38,7 +39,7 @@ RATE:
 43 = 0x34 0x33 = 3
 44 = 0x34 0x34 = 4
 
-Example message recieved with opcodes: ~BELLE*02*13*21*44* ~BELLE*03*12*20*32*42* */
+Example message recieved with opcodes: ~ARIEL*02*13*21*44* ~BELLE*03*12*20*32*42* */
 
 
 int parse_message(char* message){
@@ -52,9 +53,52 @@ int parse_message(char* message){
         _delay_ms(30);
         return -1;
     }
-
     i++;
+
+    return parse_name(message,i);
+ 
+}
+
+int parse_name(char* message, int i){
+    
+    //USART_putstring("GOT HERE"); 
+    char* op_code = malloc(sizeof(char)*6);
+    int j = 0;
+    char m = message[i];
+
     while(message[i]!='*'){ 
+        op_code[j] = message[i] ;       
+        i++;
+        j++;
+    }   
+    op_code[j]='\0';
+    //i++;
+
+    char *belle = "BELLE", *ariel = "ARIEL", *aurora = "AURORA";
+  
+    if(strcmp(op_code,belle)==0){
+        name = belle;
+        USART_putstring("BELLE"); 
+        _delay_ms(30);  
+    }
+    else if (strcmp(op_code,ariel)==0){
+        name = ariel;
+        USART_putstring("ARIEL");  
+        
+        _delay_ms(30); 
+    }
+    else if (strcmp(op_code,aurora)==0){
+        name = aurora;
+        USART_putstring("AURORA");  
+        _delay_ms(30);
+    }  
+    else{
+        USART_putstring("Fail to parse Name ");
+        _delay_ms(30);          
+        return -1;
+    }
+
+     while(message[i]!='*'){ 
         m = message[i];
         if(name[i-1]!= m){
             _delay_ms(30);
@@ -78,8 +122,7 @@ int parse_message(char* message){
         return -1;
     }
 
-    return 0;
- 
+    return 0;         
 }
 
 int parse_motor(char* message, int i){
@@ -280,4 +323,3 @@ char* concat(char *s1, char *s2)
     memcpy(result+len1, s2, len2+1);//+1 to copy the null-terminator
     return result;
 }
-
