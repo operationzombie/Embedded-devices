@@ -6,6 +6,7 @@
 char* name = "BELLE";
 
 int parse_message(char* message);
+int parse_name(char* message, int i);
 int parse_motor(char* message, int i);
 int parse_pwm(char* message, int i);
 int parse_dir(char* message, int i);
@@ -52,9 +53,7 @@ int parse_message(char* message){
         _delay_ms(30);
         return -1;
     }
-
     i++;
-    
 
     return parse_name(message,i);
  
@@ -99,7 +98,7 @@ int parse_name(char* message, int i){
         return -1;
     }
 
-    while(message[i]!='*'){ 
+     while(message[i]!='*'){ 
         m = message[i];
         if(name[i-1]!= m){
             _delay_ms(30);
@@ -107,8 +106,7 @@ int parse_name(char* message, int i){
         }
         i++;
     }   
-
-    i++;
+    i++;    //passes the * names delimeter
 
     if(parse_motor(message,i)==0){
         char* success = "Successfully updated ";
