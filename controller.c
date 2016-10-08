@@ -42,7 +42,7 @@ int  main()
   setPin(DDRB, 2,1); //pin 10 - INB
   setPin(DDRB, 5,1); //pin 13 - LED
   setPin(DDRD, 7, 1); //pin 7 - INA
-
+ 
   USART_init();                                 //init usart
   USART_unset_rxb_update();                     //ensure we don't end up in rx_update loop
 
@@ -63,13 +63,12 @@ int  main()
       _delay_ms(100);
       i = parse_message(USART_get_last_message());
       _delay_ms(100);
-
     }    
     _delay_ms(100);
                            /* toggle LED */
   }
 
-
+    _delay_ms(1000);
     //read pin value, write the value back to serial
     //sprintf(buf,"pin11: %d\r\n",readBit(PIND,2)); //read the value from pin 11, write to serial
     //USART_putstring(buf);
