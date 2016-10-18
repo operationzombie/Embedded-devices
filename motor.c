@@ -1,5 +1,6 @@
 #include "global.h"
 #include "pins.h"
+#include "pwm.h"
 
 void MOTOR_init(){
   //motor control pins:

@@ -33,12 +33,15 @@
 #include "uart.h"
 #include "network_parser.h"
 #include <string.h>
+#include "motor.h"
 
 char* name = "BELLE";
+char* no_change = "99";
 
 /*Function Protoypes */
 int parse_message(char* message);
 int parse_name(char* message, int i);
+void change_name(char*message, int i);
 int parse_motor(char* message, int i);
 int parse_pwm(char* message, int i);
 int parse_dir(char* message, int i);
@@ -87,41 +90,8 @@ int parse_message(char* message){
  *     -1 - fail.
 */
 int parse_name(char* message, int i){
-    char* op_code = malloc(sizeof(char)*6);
-    int j = 0;
-    char m = message[i];
-    char *belle = "BELLE", *ariel = "ARIEL", *aurora = "AURORA";
-
-    /* Loops until the end delimiter(*). */
-    while(message[i]!='*'){     
-        op_code[j] = message[i];       // Transfer name to op_code
-        i++;
-        j++;
-    }   
-    op_code[j]='\0';
-
-    /* Determines the name of the node */
-    if(strcmp(op_code,belle)==0){
-        name = belle;
-        USART_putstring("BELLE"); 
-        _delay_ms(30);  
-    }
-    else if (strcmp(op_code,ariel)==0){
-        name = ariel;
-        USART_putstring("ARIEL");  
-        _delay_ms(30); 
-    }
-    else if (strcmp(op_code,aurora)==0){
-        name = aurora;
-        USART_putstring("AURORA");  
-        _delay_ms(30);
-    }  
-    else{
-        USART_putstring("Fail to parse Name ");
-        _delay_ms(30);          
-        return -1;
-    }
-
+    char m;
+    
     /* Loops until the end delimiter(*). Checks if the name is in the message. */
     while(message[i]!='*'){ 
         m = message[i];
@@ -133,8 +103,13 @@ int parse_name(char* message, int i){
     }   
     i++;    //passes the * names delimeter
 
+    if(message[i]=='^'){
+        change_name(message,i);
+        return 0;
+    }        
+
     /* Checks if parsing is successfull, otherwise something went wrong */
-    if(parse_motor(message,i)==0){
+      if(parse_dir(message,i)==0){
         char* success = "Successfully updated ";
         concat(success,name);
         USART_putstring(success);
@@ -149,6 +124,15 @@ int parse_name(char* message, int i){
     }
 
     return 0;         
+}
+
+void change_name(char* message, int i){
+    char* temp = malloc(sizeof(message) - sizeof(char)*2);
+    while(message[i]!='*'){ 
+        temp[i] = message[i];        
+        i++;
+    }   
+    name=temp;    
 }
 
 /*  
@@ -286,12 +270,17 @@ int parse_dir(char* message, int i){
   
     /* Determines the direction of the motor */
     if(strcmp(op_code,bwd)==0){
+        MOTOR_set_CCW();
         USART_putstring("BACK");
         _delay_ms(30);
     }
     else if(strcmp(op_code,fwd)==0){
+        MOTOR_set_CW();
         USART_putstring("FORWARD");
         _delay_ms(30);
+    }
+    else if(strcmp(op_code,no_change)==0){
+        USART_putstring("no change");
     }
     else{
         USART_putstring("Fail to parse direction");
@@ -299,7 +288,7 @@ int parse_dir(char* message, int i){
         return -1;
     }
 
-    return parse_steps(message, i);          
+    return parse_rate(message, i);          
 }
 
 /*  
@@ -377,11 +366,13 @@ int parse_rate(char* message, int i){
   
     /* Determines the rate */
     if(strcmp(op_code,r1)==0){
-         USART_putstring("Rate 1");
+        MOTOR_set_break_GND();
+        USART_putstring("STOP");
         _delay_ms(30);        
     }
     else if(strcmp(op_code,r2)==0){
-         USART_putstring("Rate 2");
+        MOTOR_set_break_VCC();
+        USART_putstring("GO");
         _delay_ms(30);
     }
     else if(strcmp(op_code,r3)==0){
@@ -391,7 +382,10 @@ int parse_rate(char* message, int i){
     else if(strcmp(op_code,r4)==0){
          USART_putstring("Rate 4");
         _delay_ms(30);
-    }    
+    }  
+    else if(strcmp(op_code,no_change)==0){
+        USART_putstring("no change");
+    }  
     else{
         USART_putstring("Fail to parse rate");
         _delay_ms(30);
