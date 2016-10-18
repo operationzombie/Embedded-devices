@@ -139,6 +139,147 @@ void change_name(char* message, int i){
 }
 
 /*  
+ *  This function parses the direction: Forward or Backward
+ *  
+ *  @param message
+ *      Message passed from parse_pwm() with direction
+ *  
+ *  @param i
+ *      Current index in the messsage
+ *
+ *  @return 
+ *      0 - successful.
+ *     -1 - fail.
+*/
+int parse_dir(char* message, int i){
+    char* op_code = malloc(sizeof(char)*3);
+    int j = 0;
+
+    while(message[i]!='*'){ 
+        op_code[j] = message[i] ;       
+        i++;
+        j++;
+    }   
+    op_code[j]='\0';
+    i++;
+
+    char *fwd = "21", *bwd = "20";
+  
+    /* Determines the direction of the motor */
+    if(strcmp(op_code,bwd)==0){
+        MOTOR_set_CCW();
+        USART_putstring("BACK");
+        _delay_ms(30);
+    }
+    else if(strcmp(op_code,fwd)==0){
+        MOTOR_set_CW();
+        USART_putstring("FORWARD");
+        _delay_ms(30);
+    }
+    else if(strcmp(op_code,no_change)==0){
+        USART_putstring("no change");
+    }
+    else{
+        USART_putstring("Fail to parse direction");
+        _delay_ms(30);
+        return -1;
+    }
+
+    return parse_rate(message, i);          
+}
+
+
+/*  
+ *  This function parses the rate. 
+ *  
+ *  @param message
+ *      Message passed from parse_step()
+ *  
+ *  @param i
+ *      Current index in the messsage
+ *
+ *  @return 
+ *      0 - successful.
+ *     -1 - fail.
+*/
+int parse_rate(char* message, int i){
+    char* op_code = malloc(sizeof(char)*3);
+    int j = 0;
+
+    while(message[i]!='*'){         
+        op_code[j] = message[i] ;       
+        i++;
+        j++;
+    }   
+    op_code[j]='\0';
+    i++;
+
+    char* r1 = "41", *r2 = "42", *r3 = "43", *r4 = "44";
+  
+    /* Determines the rate */
+    if(strcmp(op_code,r1)==0){
+        MOTOR_set_break_GND();
+        USART_putstring("STOP");
+        _delay_ms(30);        
+    }
+    else if(strcmp(op_code,r2)==0){
+        MOTOR_set_break_VCC();
+        USART_putstring("GO");
+        _delay_ms(30);
+    }
+    else if(strcmp(op_code,r3)==0){
+         USART_putstring("Rate 3");
+        _delay_ms(30);
+    }
+    else if(strcmp(op_code,r4)==0){
+         USART_putstring("Rate 4");
+        _delay_ms(30);
+    }  
+    else if(strcmp(op_code,no_change)==0){
+        USART_putstring("no change");
+    }  
+    else{
+        USART_putstring("Fail to parse rate");
+        _delay_ms(30);
+        return -1;
+    }
+
+    return 0;       
+}
+
+/*  
+ *  Concatenates two strings, this is mainly use for debugging
+ *  
+ *  @param s1
+ *      first string 
+ *  
+ *  @param s2
+ *      second string
+ *
+ *  @return 
+ *      result -- concatenated strings
+*/
+char* concat(char *s1, char *s2){
+    int len1 = strlen(s1);
+    int len2 = strlen(s2);
+    char *result = malloc(len1+len2+1); //+1 for the zero-terminator    
+    memcpy(result, s1, len1);
+    memcpy(result+len1, s2, len2+1);    //+1 to copy the null-terminator
+    return result;
+}
+
+
+
+/***************************************************************************
+****************************************************************************
+The following code is currently redundant. Should be used for additional 
+function in the hardware, such as change motor type, stepper and PWM
+****************************************************************************
+***************************************************************************/
+
+
+
+/*  
  *  This function parses motor type: Full Swing, Half Swing, Stepper, Servo
  *  
  *  @param message
@@ -245,56 +386,6 @@ int parse_pwm(char* message, int i){
 }
 
 /*  
- *  This function parses the direction: Forward or Backward
- *  
- *  @param message
- *      Message passed from parse_pwm() with direction
- *  
- *  @param i
- *      Current index in the messsage
- *
- *  @return 
- *      0 - successful.
- *     -1 - fail.
-*/
-int parse_dir(char* message, int i){
-    char* op_code = malloc(sizeof(char)*3);
-    int j = 0;
-
-    while(message[i]!='*'){ 
-        op_code[j] = message[i] ;       
-        i++;
-        j++;
-    }   
-    op_code[j]='\0';
-    i++;
-
-    char *fwd = "21", *bwd = "20";
-  
-    /* Determines the direction of the motor */
-    if(strcmp(op_code,bwd)==0){
-        MOTOR_set_CCW();
-        USART_putstring("BACK");
-        _delay_ms(30);
-    }
-    else if(strcmp(op_code,fwd)==0){
-        MOTOR_set_CW();
-        USART_putstring("FORWARD");
-        _delay_ms(30);
-    }
-    else if(strcmp(op_code,no_change)==0){
-        USART_putstring("no change");
-    }
-    else{
-        USART_putstring("Fail to parse direction");
-        _delay_ms(30);
-        return -1;
-    }
-
-    return parse_rate(message, i);          
-}
-
-/*  
  *  This function parses how many steps it should take. 
  *  
  *  @param message
@@ -340,81 +431,4 @@ int parse_steps(char* message, int i){
     return parse_rate(message, i);   
 }
 
-/*  
- *  This function parses the rate. 
- *  
- *  @param message
- *      Message passed from parse_step()
- *  
- *  @param i
- *      Current index in the messsage
- *
- *  @return 
- *      0 - successful.
- *     -1 - fail.
-*/
-int parse_rate(char* message, int i){
-    char* op_code = malloc(sizeof(char)*3);
-    int j = 0;
 
-    while(message[i]!='*'){         
-        op_code[j] = message[i] ;       
-        i++;
-        j++;
-    }   
-    op_code[j]='\0';
-    i++;
-
-    char* r1 = "41", *r2 = "42", *r3 = "43", *r4 = "44";
-  
-    /* Determines the rate */
-    if(strcmp(op_code,r1)==0){
-        MOTOR_set_break_GND();
-        USART_putstring("STOP");
-        _delay_ms(30);        
-    }
-    else if(strcmp(op_code,r2)==0){
-        MOTOR_set_break_VCC();
-        USART_putstring("GO");
-        _delay_ms(30);
-    }
-    else if(strcmp(op_code,r3)==0){
-         USART_putstring("Rate 3");
-        _delay_ms(30);
-    }
-    else if(strcmp(op_code,r4)==0){
-         USART_putstring("Rate 4");
-        _delay_ms(30);
-    }  
-    else if(strcmp(op_code,no_change)==0){
-        USART_putstring("no change");
-    }  
-    else{
-        USART_putstring("Fail to parse rate");
-        _delay_ms(30);
-        return -1;
-    }
-
-    return 0;       
-}
-
-/*  
- *  Concatenates two strings, this is mainly use for debugging
- *  
- *  @param s1
- *      first string 
- *  
- *  @param s2
- *      second string
- *
- *  @return 
- *      result -- concatenated strings
-*/
-char* concat(char *s1, char *s2){
-    int len1 = strlen(s1);
-    int len2 = strlen(s2);
-    char *result = malloc(len1+len2+1); //+1 for the zero-terminator    
-    memcpy(result, s1, len1);
-    memcpy(result+len1, s2, len2+1);    //+1 to copy the null-terminator
-    return result;
-}
