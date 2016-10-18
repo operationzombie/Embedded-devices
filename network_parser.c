@@ -167,12 +167,12 @@ int parse_dir(char* message, int i){
   
     /* Determines the direction of the motor */
     if(strcmp(op_code,bwd)==0){
-        MOTOR_set_CCW();
+        MOTOR_dir(1);
         USART_putstring("BACK");
         _delay_ms(30);
     }
     else if(strcmp(op_code,fwd)==0){
-        MOTOR_set_CW();
+        MOTOR_dir(0);
         USART_putstring("FORWARD");
         _delay_ms(30);
     }
@@ -218,14 +218,9 @@ int parse_rate(char* message, int i){
   
     /* Determines the rate */
     if(strcmp(op_code,r1)==0){
-        MOTOR_set_break_GND();
+        MOTOR_set_break();
         USART_putstring("STOP");
         _delay_ms(30);        
-    }
-    else if(strcmp(op_code,r2)==0){
-        MOTOR_set_break_VCC();
-        USART_putstring("GO");
-        _delay_ms(30);
     }
     else if(strcmp(op_code,r3)==0){
          USART_putstring("Rate 3");

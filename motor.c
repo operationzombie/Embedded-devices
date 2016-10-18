@@ -14,31 +14,12 @@ void MOTOR_init(){
   DDRD = 0x00 || (1 << 7);
 }
 
-void MOTOR_INA(int val){
-  setPin(PORTD, 7, val);
-}
 
-void MOTOR_INB(int val){
+
+void MOTOR_dir(int val){
   setPin(PORTB, 0, val);
 }
 
-void MOTOR_set_CW(){
-  MOTOR_INA(1);
-  MOTOR_INB(0);
-}
-
-void MOTOR_set_CCW(){
-  MOTOR_INA(0);
-  MOTOR_INB(1);
-}
-
-
-void MOTOR_set_break_VCC(){
-  MOTOR_INA(1);
-  MOTOR_INB(1);
-}
-
-void MOTOR_set_break_GND(){
-  MOTOR_INA(0);
-  MOTOR_INB(0);
+void MOTOR_set_break(){
+  PWM_disable();
 }

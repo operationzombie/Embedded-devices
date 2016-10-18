@@ -22,8 +22,7 @@ char buf[INPUT_BUFFER_SIZE];
   | 1    | PD1  |   TX        |
   | 2    | PD2  |   Int0      |
   | 3    | PD3  |   Int1      |
-  | 7    | PD7  |   INA       |
-  | 8    | PB0  |   INB       |
+  | 8    | PB0  |   DIR       |
   | 9    | PB1  |   PWM1      |
   | 10   | PB2  |   PWM2      |
   | 13   | PB5  |   LED       |
@@ -37,11 +36,10 @@ int  main()
   DDRB = 0x00;
   DDRC = 0x00;
   DDRD = 0x00; 
-  setPin(DDRB, 0,1); //pin 8  - INB
-  setPin(DDRB, 1,1); //pin 9  - INB
-  setPin(DDRB, 2,1); //pin 10 - INB
+  setPin(DDRB, 0,1); //pin 8  - DIR
+  setPin(DDRB, 1,1); //pin 9  - PWM1
+  setPin(DDRB, 2,1); //pin 10 - PWM2
   setPin(DDRB, 5,1); //pin 13 - LED
-  setPin(DDRD, 7, 1); //pin 7 - INA
  
   USART_init();                                 //init usart
   USART_unset_rxb_update();                     //ensure we don't end up in rx_update loop
@@ -49,9 +47,7 @@ int  main()
   //values are 0-25 for dutycycle at 600Hz
   //first argument is pin 9
   //second argument is pin 10
-  PWM_set(20,20);
-  MOTOR_set_CCW();
-
+  
   //INTS_init_0(2);                               //enable interrupt 0, on change
   //INTS_init_1(2);                               //enable interrupt 1, on change
 
