@@ -126,6 +126,9 @@ int parse_name(char* message, int i){
     return 0;         
 }
 
+/*This function is used when a node needs to have its name updated. It simply 
+takes the name from the message and updates the name pointer*/
+
 void change_name(char* message, int i){
     char* temp = malloc(sizeof(message) - sizeof(char)*2);
     while(message[i]!='*'){ 
