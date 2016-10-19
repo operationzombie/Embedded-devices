@@ -200,15 +200,14 @@ int parse_dir(char* message, int i){
         return -1;
     }
 
-    return parse_rate(message, i);          
+    return parse_speed(message, i);          
 }
 
-
 /*  
- *  This function parses the rate. 
+ *  This function parses how many steps it should take. 
  *  
  *  @param message
- *      Message passed from parse_step()
+ *      Message passed from parse_dir() and only for Stepper mode
  *  
  *  @param i
  *      Current index in the messsage
@@ -217,50 +216,45 @@ int parse_dir(char* message, int i){
  *      0 - successful.
  *     -1 - fail.
 */
-int parse_rate(char* message, int i){
-    char* op_code = malloc(sizeof(char)*3);
+int parse_speed(char* message, int i){
+    char* op_code = malloc(sizeof(char)*7);
+    int speed_percent = 0;
     int j = 0;
 
-    while(message[i]!='*'){         
+    while(message[i]!='*'){ 
         op_code[j] = message[i] ;       
         i++;
         j++;
     }   
-    op_code[j]='\0';
+    op_code[j] = '\0';
     i++;
+    
+    int k = 0;
 
-    char* r1 = "41", *r2 = "42", *r3 = "43", *r4 = "44", *no_change = "99";
-  
-    /* Determines the rate */
-    if(strcmp(op_code,r1)==0){
-        MOTOR_set_break();
-        USART_putstring("STOP");
-        _delay_ms(30);        
+    /* Determines the number of steps */
+    for(k=0; k<j; k++){
+        speed_percent = speed_percent * 10 + ( op_code[k] - '0' );
     }
-    else if(strcmp(op_code,r2)==0){
-         USART_putstring("r2");
-        _delay_ms(30);
-    }
-    else if(strcmp(op_code,r3)==0){
-         USART_putstring("Rate 3");
-        _delay_ms(30);
-    }
-    else if(strcmp(op_code,r4)==0){
-         USART_putstring("Rate 4");
-        _delay_ms(30);
-    }  
-    else if(strcmp(op_code,no_change)==0){
-        USART_putstring("no change");
-        _delay_ms(30);
-    }  
-    else{
-        USART_putstring("Fail to parse rate");
+
+    /* Sanity or bound checker */
+    if(speed_percent<0||speed_percent>100){
+        USART_putstring("Fail to parse Speed");
         _delay_ms(30);
         return -1;
     }
-
-    return 0;       
+    else{
+        //function to change speed pass in (255*(speed_percent/100));
+           
+        USART_putstring("Speed success");
+        _delay_ms(30);
+    
+    } 
+    
+    return 0;   
 }
+
+
+
 
 /*  
  *  Concatenates two strings, this is mainly use for debugging
@@ -402,10 +396,10 @@ int parse_pwm(char* message, int i){
 }
 
 /*  
- *  This function parses how many steps it should take. 
+ *  This function parses the rate. 
  *  
  *  @param message
- *      Message passed from parse_dir() and only for Stepper mode
+ *      Message passed from parse_step()
  *  
  *  @param i
  *      Current index in the messsage
@@ -414,37 +408,50 @@ int parse_pwm(char* message, int i){
  *      0 - successful.
  *     -1 - fail.
 */
-int parse_steps(char* message, int i){
-    char* op_code = malloc(sizeof(char)*7);
-    int num_steps = 0;
+int parse_rate(char* message, int i){
+    char* op_code = malloc(sizeof(char)*3);
     int j = 0;
 
-    while(message[i]!='*'){ 
+    while(message[i]!='*'){         
         op_code[j] = message[i] ;       
         i++;
         j++;
     }   
-    op_code[j] = '\0';
+    op_code[j]='\0';
     i++;
-    
-    int k = 0;
 
-    /* Determines the number of steps */
-    for(k=0; k<j; k++){
-        num_steps = num_steps * 10 + ( op_code[k] - '0' );
+    char* r1 = "41", *r2 = "42", *r3 = "43", *r4 = "44", *no_change = "99";
+  
+    /* Determines the rate */
+    if(strcmp(op_code,r1)==0){
+        MOTOR_set_break();
+        USART_putstring("STOP");
+        _delay_ms(30);        
     }
-
-    /* Sanity or bound checker */
-    if(num_steps<0||num_steps>65536){
-        USART_putstring("Fail to parse Steps");
+    else if(strcmp(op_code,r2)==0){
+         USART_putstring("r2");
+        _delay_ms(30);
+    }
+    else if(strcmp(op_code,r3)==0){
+         USART_putstring("Rate 3");
+        _delay_ms(30);
+    }
+    else if(strcmp(op_code,r4)==0){
+         USART_putstring("Rate 4");
+        _delay_ms(30);
+    }  
+    else if(strcmp(op_code,no_change)==0){
+        USART_putstring("no change");
+        _delay_ms(30);
+    }  
+    else{
+        USART_putstring("Fail to parse rate");
         _delay_ms(30);
         return -1;
     }
-    
-    USART_putstring("Steps success");
-    _delay_ms(30);
-    
-    return parse_rate(message, i);   
+
+    return 0;       
 }
+
 
 
