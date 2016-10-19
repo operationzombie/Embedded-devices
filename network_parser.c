@@ -46,7 +46,7 @@ void change_name(char*message, int i);
 int parse_motor(char* message, int i);
 int parse_pwm(char* message, int i);
 int parse_dir(char* message, int i);
-int parse_steps(char* message, int i);
+int parse_speed(char* message, int i);
 int parse_rate(char* message, int i);
 char* concat(char *s1, char *s2);
 
@@ -247,6 +247,9 @@ int parse_speed(char* message, int i){
            
         USART_putstring("Speed success");
         _delay_ms(30);
+        USART_putstring(op_code);
+        _delay_ms(30);
+        
     
     } 
     
