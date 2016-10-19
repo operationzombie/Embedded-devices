@@ -56,7 +56,8 @@ int  main()
   //INTS_init_1(2);                               //enable interrupt 1, on change
 
   while(1){
-    count++;
+    count++;    
+    _delay_ms(30);
     if (USART_need_rx_update()){                //a string has been recieved, update the things
       USART_unset_rxb_update();
       USART_copy_rxb();

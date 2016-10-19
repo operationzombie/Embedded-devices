@@ -27,6 +27,8 @@
  *  Example message recieved with opcodes: 
  *       -   Example of Stepper mode:  ~ARIEL*02*13*21*44* 
  *       -   Example of Full Swing mode: ~BELLE*03*12*20*32*42* 
+ *  
+ *  ~BELLE*21*41*# ~BELLE*20*42*# ~BELLE*99*99*#
 */
 
 #include "global.h"
@@ -36,7 +38,6 @@
 #include "motor.h"
 
 char* name = "BELLE";
-char* no_change = "99";
 
 /*Function Protoypes */
 int parse_message(char* message);
@@ -71,6 +72,7 @@ int parse_message(char* message){
         _delay_ms(30);
         return -1;
     }
+
     i++;
     return parse_name(message,i);
 }
@@ -103,10 +105,10 @@ int parse_name(char* message, int i){
     }   
     i++;    //passes the * names delimeter
 
-    if(message[i]=='^'){
-        change_name(message,i);
+  /*  if(message[i]=='^'){
+        change_name(message,i+1);
         return 0;
-    }        
+    }        */
 
     /* Checks if parsing is successfull, otherwise something went wrong */
       if(parse_dir(message,i)==0){
@@ -130,12 +132,17 @@ int parse_name(char* message, int i){
 takes the name from the message and updates the name pointer*/
 
 void change_name(char* message, int i){
-    char* temp = malloc(sizeof(message) - sizeof(char)*2);
+    char* temp[10];    
     while(message[i]!='*'){ 
         temp[i] = message[i];        
         i++;
     }   
-    name=temp;    
+    temp[i] = '\0';
+    _delay_ms(30);
+    strcpy(name, temp);
+    USART_putstring(name);
+    USART_putstring(temp);
+    _delay_ms(30);    
 }
 
 /*  
@@ -163,7 +170,7 @@ int parse_dir(char* message, int i){
     op_code[j]='\0';
     i++;
 
-    char *fwd = "21", *bwd = "20";
+    char *fwd = "21", *bwd = "20", *no_change = "99";
   
     /* Determines the direction of the motor */
     if(strcmp(op_code,bwd)==0){
@@ -178,6 +185,7 @@ int parse_dir(char* message, int i){
     }
     else if(strcmp(op_code,no_change)==0){
         USART_putstring("no change");
+        _delay_ms(30);
     }
     else{
         USART_putstring("Fail to parse direction");
@@ -214,7 +222,7 @@ int parse_rate(char* message, int i){
     op_code[j]='\0';
     i++;
 
-    char* r1 = "41", *r2 = "42", *r3 = "43", *r4 = "44";
+    char* r1 = "41", *r2 = "42", *r3 = "43", *r4 = "44", *no_change = "99";
   
     /* Determines the rate */
     if(strcmp(op_code,r1)==0){
@@ -237,6 +245,7 @@ int parse_rate(char* message, int i){
     }  
     else if(strcmp(op_code,no_change)==0){
         USART_putstring("no change");
+        _delay_ms(30);
     }  
     else{
         USART_putstring("Fail to parse rate");
@@ -259,6 +268,7 @@ int parse_rate(char* message, int i){
  *  @return 
  *      result -- concatenated strings
 */
+
 char* concat(char *s1, char *s2){
     int len1 = strlen(s1);
     int len2 = strlen(s2);
