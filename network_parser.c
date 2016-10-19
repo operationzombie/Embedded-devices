@@ -65,10 +65,8 @@ int parse_message(char* message){
     int i = 0;
     char m = message[i];
 
-    if(m!='~'){         //checks for the starting delimiter  
-        char* fail = "Failed to update ";
-        concat(fail,name);
-        USART_putstring(fail);
+    if(m!='~'){         //checks for the starting delimiter          
+        USART_putstring("IGNORE");
         _delay_ms(30);
         return -1;
     }
@@ -98,6 +96,9 @@ int parse_name(char* message, int i){
     while(message[i]!='*'){ 
         m = message[i];
         if(name[i-1]!= m){    
+            USART_putstring("NOT FOR ME I AM ");
+            _delay_ms(30);
+            USART_putstring(name);
             _delay_ms(30);
             return -1;
         }
@@ -105,10 +106,10 @@ int parse_name(char* message, int i){
     }   
     i++;    //passes the * names delimeter
 
-  /*  if(message[i]=='^'){
+    if(message[i]=='^'){
         change_name(message,i+1);
         return 0;
-    }        */
+    }        
 
     /* Checks if parsing is successfull, otherwise something went wrong */
       if(parse_dir(message,i)==0){
@@ -132,17 +133,23 @@ int parse_name(char* message, int i){
 takes the name from the message and updates the name pointer*/
 
 void change_name(char* message, int i){
-    char* temp[10];    
+
+    char temp[10];    
+    int j = 0;
+    
+
     while(message[i]!='*'){ 
-        temp[i] = message[i];        
+        temp[j] = message[i];    
+        _delay_ms(10);    
         i++;
+        j++;
     }   
-    temp[i] = '\0';
-    _delay_ms(30);
+    temp[j] = '\0';
+    
     strcpy(name, temp);
     USART_putstring(name);
-    USART_putstring(temp);
-    _delay_ms(30);    
+    _delay_ms(30);
+    
 }
 
 /*  
@@ -229,6 +236,10 @@ int parse_rate(char* message, int i){
         MOTOR_set_break();
         USART_putstring("STOP");
         _delay_ms(30);        
+    }
+    else if(strcmp(op_code,r2)==0){
+         USART_putstring("r2");
+        _delay_ms(30);
     }
     else if(strcmp(op_code,r3)==0){
          USART_putstring("Rate 3");
