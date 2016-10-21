@@ -1,5 +1,6 @@
 #include "uart.h"
 #include "global.h"
+#include "pwm.h"
 // dir    trigger
 // 0      rise
 // 1      fall
@@ -48,15 +49,11 @@ void INTS_disable_int1(void){
 
 ISR (INT0_vect)
 {
-    /* interrupt code here */
-  USART_putstring("int1 triggered \r\n");
-  _delay_ms(20);
+    PWM_disable();
 }
 
 
 ISR (INT1_vect)
 {
-  USART_putstring("int2 triggered \r\n");
-  _delay_ms(20);
-    /* interrupt code here */
+    PWM_disable();
 }
