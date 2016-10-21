@@ -249,7 +249,7 @@ int parse_speed(char* message, int i){
         _delay_ms(30);
         USART_putstring(op_code);
         _delay_ms(30);
-        
+        PWM_set(speed_percent);
     
     } 
     
