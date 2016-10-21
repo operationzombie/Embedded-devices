@@ -1,10 +1,17 @@
 #include "global.h"
 #include "pins.h"
 
-//values are 0-25 for dutycycle at 600Hz
-//with 0 being nothing, and 25 being 100%
-//first argument is pin 9
-//second argument is pin 10
+/*  
+ *  Initializes hardware PWM module 1, putting the module into fast PWM mode 
+ *  PWM module 1 is connected to pin 9 on the arduino
+ *  
+ *  @param duty_1
+ *     an integer in the range 0-25, specifying the required dutycycle forthe pwm module 
+ *
+ *  @return 
+ *     void
+ *
+*/
 void PWM_set(int duty_1){
   DDRB |= (1 << DDB1)|(1 << DDB2);
 	// PB1 and PB2 is now an output
@@ -26,6 +33,16 @@ void PWM_set(int duty_1){
 	// 256 presc}
 }
 
+/*  
+ *  Disables PWM module 1, shutting off PWM output
+ *  
+ *  @param 
+ *     void
+ *
+ *  @return 
+ *     void
+ *
+*/
 void PWM_disable(){
 	//TODO: unset COM1A1 COM1A0 bits
 	setPin(TCCR1A, 7, 0);
