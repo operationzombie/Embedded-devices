@@ -4,6 +4,7 @@
 #include "pins.h"
 #include "motor.h"
 #include "stdio.h"
+#include "interrupts.h"
 #include "network_parser.h"
 
  
@@ -24,7 +25,6 @@ char buf[INPUT_BUFFER_SIZE];
   | 3    | PD3  |   Int1      |
   | 8    | PB0  |   DIR       |
   | 9    | PB1  |   PWM1      |
-  | 10   | PB2  |   PWM2      |
   | 13   | PB5  |   LED       |
   |===========================|
   */
@@ -44,12 +44,9 @@ int  main()
   USART_init();                                 //init usart
   USART_unset_rxb_update();                     //ensure we don't end up in rx_update loop
 
-  //values are 0-25 for dutycycle at 600Hz
-  //first argument is pin 9
-  //second argument is pin 10
   
-  //INTS_init_0(2);                               //enable interrupt 0, on change
-  //INTS_init_1(2);                               //enable interrupt 1, on change
+  INTS_init_0(2);                               //enable interrupt 0, on change
+  INTS_init_1(2);                               //enable interrupt 1, on change
 
   while(1){
     count++;    
