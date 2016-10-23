@@ -50,12 +50,16 @@ ISR(USART_UDRE_vect)
   }
 }
 
-/* 
- * ===  FUNCTION  ======================================================================
- *         Name:  USART_init
- *  Description:  set all registers and initialize relevant variables to enable uart
- * =====================================================================================
- */
+/*  
+ *  sets all registers and calculates any values needed to initialize the UART module
+ *  this should be called once during program setup, or whenever the baud rate needs to
+ *  be updated. 
+ *  
+ *  @param void
+ *
+ *  @return 
+ *
+*/
 void USART_init(void){
   current_rxb = rx_buffer; //set rx buffer pointer
   
@@ -69,61 +73,81 @@ void USART_init(void){
     sei();//ADDED
 }
  
-/* 
- * ===  FUNCTION  ======================================================================
- *         Name:  USART_putstring
- *  Description:  transmits a string via serial
+/*  
+ *  takes a char array and will update the current_txb address from which 
+ *  characters are transmitted, and begings transmission before setting the currently_tx
+ *  flag which indicated that the system is currently transmitting data
  *
- *                Warning: if this is called when currently transmitting, the current 
- *                message pointer will be replkaced with this one, meaning the 
- *                message will not be properly transmitted
- * =====================================================================================
- */
+ *  Note, calling this function while trasmission is currently underway will 
+ *  overwrite the currrent_txb value, meaning the previously transmitting string will 
+ *  be lost. 
+ *
+ *  
+ *  @param void
+ *
+ *  @return 
+ *    currently_tx status, indicating if the system is transmitting or not
+ *
+*/
 void USART_putstring(char* S){
   current_txb = S;
   UCSR0B |= (1<< UDRIE0);
   currently_tx = 1;
 }
 
-/* 
- * ===  FUNCTION  ======================================================================
- *         Name:  USART_get_tx_status
- *  Description:  getter function, reporting current status of transmission
- * =====================================================================================
- */
+
+/*  
+ *  returns the current state of the update_rxb flag
+ *  
+ *  @param void
+ *
+ *  @return 
+ *    currently_tx status, indicating if the system is transmitting or not
+ *
+*/
 char USART_get_tx_status(void){
   return currently_tx;
 }
 
-/* 
- * ===  FUNCTION  ======================================================================
- *         Name:  USART_need_rx_update
- *  Description:  getter function, reporting the current need for string recieve 
- *                handling
- * =====================================================================================
- */
+
+/*  
+ *  returns the current state of the update_rxb flag
+ *  
+ *  @param void
+ *
+ *  @return 
+ *    update_rxb status indicating if the system needs to handle recieved input
+ *
+*/
 char USART_need_rx_update(void){
   return update_rxb;
 }
 
-/* 
- * ===  FUNCTION  ======================================================================
- *         Name:  USART_unset_rxb_update
- *  Description:  setter, unsets the need_rxb_update flag, indicating the recent rxb 
- *                action has been performed
- * =====================================================================================
- */
+/*  
+ *  Unsets the need_rxb_update flag, which signals a recieve operation has completed
+ *  and that the main loop should check the latest message buffer
+ *  
+ *  @param void
+ *
+ *  @return 
+ *
+*/
 void USART_unset_rxb_update(void){
   update_rxb = 0;
 }
 
-/* 
- * ===  FUNCTION  ======================================================================
- *         Name:  USART_copy_rxb
- *  Description:  copy the rx buffer to complete_buffer, useful if a buffer fills, or
- *                transmission completes, so prepare for new transmission
- * =====================================================================================
- */
+/*  
+ *  copies the contents of the input buffer into the complete message buffer
+ *  this should be called when one of seveal recieve cases have been met:
+ *    * a newline character was recieved
+ *    * an end of string character was recieved
+ *    * the recieve buffer is full
+ *  
+ *  @param void
+ *
+ *  @return 
+ *
+*/
 void USART_copy_rxb(void){
   //copy the rx buffer, then zero it for incoming transmission
   for (u = 0; u < INPUT_BUFFER_SIZE; u++){
@@ -134,20 +158,32 @@ void USART_copy_rxb(void){
 }
 
 
-/* 
- * ===  FUNCTION  ======================================================================
- *         Name:  USART_get_last_message
- *  Description:  getter, returning the last complete message recieved (or the rx_buffer
- *                when it filled)
- * =====================================================================================
- */
+/*  
+ *  returns a buffer containing the last complete message
+ *  recieved by the UART module
+ *  
+ *  @param void
+ *
+ *  @return 
+ *      pointer to the character array buffer containing the 
+ *      last recieved message
+*/
 char* USART_get_last_message(void){
   return complete_buffer;
 }
 
 
-/*STUFF THAT IS PROBABLY GOING TO BREAK EVERYTHING*/
 
+/*  
+ *  Send a single character out the UART module  
+ *  
+ *  @param data
+ *      a single character to be transmitted
+ *      
+ *
+ *  @return 
+ *      void
+*/
 void USART_send( unsigned char data)
 {
   //while the transmit buffer is not empty loop
